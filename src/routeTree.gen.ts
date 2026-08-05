@@ -10,33 +10,156 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedMisPedidosRouteImport } from './routes/_authenticated/mis-pedidos'
+import { Route as AuthenticatedPanelRouteImport } from './routes/_authenticated/panel'
+import { Route as AuthenticatedPedidosRouteImport } from './routes/_authenticated/pedidos'
+import { Route as AuthenticatedPanelIndexRouteImport } from './routes/_authenticated/panel.index'
+import { Route as AuthenticatedPanelClientesRouteImport } from './routes/_authenticated/panel.clientes'
+import { Route as AuthenticatedPanelCuentasRouteImport } from './routes/_authenticated/panel.cuentas'
+import { Route as AuthenticatedPanelPedidosRouteImport } from './routes/_authenticated/panel.pedidos'
+import { Route as AuthenticatedPanelProductosRouteImport } from './routes/_authenticated/panel.productos'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedMisPedidosRoute = AuthenticatedMisPedidosRouteImport.update({
+  id: '/mis-pedidos',
+  path: '/mis-pedidos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPanelRoute = AuthenticatedPanelRouteImport.update({
+  id: '/panel',
+  path: '/panel',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPedidosRoute = AuthenticatedPedidosRouteImport.update({
+  id: '/pedidos',
+  path: '/pedidos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPanelIndexRoute = AuthenticatedPanelIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedPanelRoute,
+} as any)
+const AuthenticatedPanelClientesRoute =
+  AuthenticatedPanelClientesRouteImport.update({
+    id: '/clientes',
+    path: '/clientes',
+    getParentRoute: () => AuthenticatedPanelRoute,
+  } as any)
+const AuthenticatedPanelCuentasRoute =
+  AuthenticatedPanelCuentasRouteImport.update({
+    id: '/cuentas',
+    path: '/cuentas',
+    getParentRoute: () => AuthenticatedPanelRoute,
+  } as any)
+const AuthenticatedPanelPedidosRoute =
+  AuthenticatedPanelPedidosRouteImport.update({
+    id: '/pedidos',
+    path: '/pedidos',
+    getParentRoute: () => AuthenticatedPanelRoute,
+  } as any)
+const AuthenticatedPanelProductosRoute =
+  AuthenticatedPanelProductosRouteImport.update({
+    id: '/productos',
+    path: '/productos',
+    getParentRoute: () => AuthenticatedPanelRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/mis-pedidos': typeof AuthenticatedMisPedidosRoute
+  '/panel': typeof AuthenticatedPanelRouteWithChildren
+  '/pedidos': typeof AuthenticatedPedidosRoute
+  '/panel/clientes': typeof AuthenticatedPanelClientesRoute
+  '/panel/cuentas': typeof AuthenticatedPanelCuentasRoute
+  '/panel/pedidos': typeof AuthenticatedPanelPedidosRoute
+  '/panel/productos': typeof AuthenticatedPanelProductosRoute
+  '/panel/': typeof AuthenticatedPanelIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/mis-pedidos': typeof AuthenticatedMisPedidosRoute
+  '/pedidos': typeof AuthenticatedPedidosRoute
+  '/panel/clientes': typeof AuthenticatedPanelClientesRoute
+  '/panel/cuentas': typeof AuthenticatedPanelCuentasRoute
+  '/panel/pedidos': typeof AuthenticatedPanelPedidosRoute
+  '/panel/productos': typeof AuthenticatedPanelProductosRoute
+  '/panel': typeof AuthenticatedPanelIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_authenticated/mis-pedidos': typeof AuthenticatedMisPedidosRoute
+  '/_authenticated/panel': typeof AuthenticatedPanelRouteWithChildren
+  '/_authenticated/pedidos': typeof AuthenticatedPedidosRoute
+  '/_authenticated/panel/clientes': typeof AuthenticatedPanelClientesRoute
+  '/_authenticated/panel/cuentas': typeof AuthenticatedPanelCuentasRoute
+  '/_authenticated/panel/pedidos': typeof AuthenticatedPanelPedidosRoute
+  '/_authenticated/panel/productos': typeof AuthenticatedPanelProductosRoute
+  '/_authenticated/panel/': typeof AuthenticatedPanelIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/mis-pedidos'
+    | '/panel'
+    | '/pedidos'
+    | '/panel/clientes'
+    | '/panel/cuentas'
+    | '/panel/pedidos'
+    | '/panel/productos'
+    | '/panel/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/mis-pedidos'
+    | '/pedidos'
+    | '/panel/clientes'
+    | '/panel/cuentas'
+    | '/panel/pedidos'
+    | '/panel/productos'
+    | '/panel'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/mis-pedidos'
+    | '/_authenticated/panel'
+    | '/_authenticated/pedidos'
+    | '/_authenticated/panel/clientes'
+    | '/_authenticated/panel/cuentas'
+    | '/_authenticated/panel/pedidos'
+    | '/_authenticated/panel/productos'
+    | '/_authenticated/panel/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,22 +171,118 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/mis-pedidos': {
+      id: '/_authenticated/mis-pedidos'
+      path: '/mis-pedidos'
+      fullPath: '/mis-pedidos'
+      preLoaderRoute: typeof AuthenticatedMisPedidosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/panel': {
+      id: '/_authenticated/panel'
+      path: '/panel'
+      fullPath: '/panel'
+      preLoaderRoute: typeof AuthenticatedPanelRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/pedidos': {
+      id: '/_authenticated/pedidos'
+      path: '/pedidos'
+      fullPath: '/pedidos'
+      preLoaderRoute: typeof AuthenticatedPedidosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/panel/': {
+      id: '/_authenticated/panel/'
+      path: '/'
+      fullPath: '/panel/'
+      preLoaderRoute: typeof AuthenticatedPanelIndexRouteImport
+      parentRoute: typeof AuthenticatedPanelRoute
+    }
+    '/_authenticated/panel/clientes': {
+      id: '/_authenticated/panel/clientes'
+      path: '/clientes'
+      fullPath: '/panel/clientes'
+      preLoaderRoute: typeof AuthenticatedPanelClientesRouteImport
+      parentRoute: typeof AuthenticatedPanelRoute
+    }
+    '/_authenticated/panel/cuentas': {
+      id: '/_authenticated/panel/cuentas'
+      path: '/cuentas'
+      fullPath: '/panel/cuentas'
+      preLoaderRoute: typeof AuthenticatedPanelCuentasRouteImport
+      parentRoute: typeof AuthenticatedPanelRoute
+    }
+    '/_authenticated/panel/pedidos': {
+      id: '/_authenticated/panel/pedidos'
+      path: '/pedidos'
+      fullPath: '/panel/pedidos'
+      preLoaderRoute: typeof AuthenticatedPanelPedidosRouteImport
+      parentRoute: typeof AuthenticatedPanelRoute
+    }
+    '/_authenticated/panel/productos': {
+      id: '/_authenticated/panel/productos'
+      path: '/productos'
+      fullPath: '/panel/productos'
+      preLoaderRoute: typeof AuthenticatedPanelProductosRouteImport
+      parentRoute: typeof AuthenticatedPanelRoute
+    }
   }
 }
 
+interface AuthenticatedPanelRouteChildren {
+  AuthenticatedPanelClientesRoute: typeof AuthenticatedPanelClientesRoute
+  AuthenticatedPanelCuentasRoute: typeof AuthenticatedPanelCuentasRoute
+  AuthenticatedPanelPedidosRoute: typeof AuthenticatedPanelPedidosRoute
+  AuthenticatedPanelProductosRoute: typeof AuthenticatedPanelProductosRoute
+  AuthenticatedPanelIndexRoute: typeof AuthenticatedPanelIndexRoute
+}
+
+const AuthenticatedPanelRouteChildren: AuthenticatedPanelRouteChildren = {
+  AuthenticatedPanelClientesRoute: AuthenticatedPanelClientesRoute,
+  AuthenticatedPanelCuentasRoute: AuthenticatedPanelCuentasRoute,
+  AuthenticatedPanelPedidosRoute: AuthenticatedPanelPedidosRoute,
+  AuthenticatedPanelProductosRoute: AuthenticatedPanelProductosRoute,
+  AuthenticatedPanelIndexRoute: AuthenticatedPanelIndexRoute,
+}
+
+const AuthenticatedPanelRouteWithChildren =
+  AuthenticatedPanelRoute._addFileChildren(AuthenticatedPanelRouteChildren)
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedMisPedidosRoute: typeof AuthenticatedMisPedidosRoute
+  AuthenticatedPanelRoute: typeof AuthenticatedPanelRouteWithChildren
+  AuthenticatedPedidosRoute: typeof AuthenticatedPedidosRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedMisPedidosRoute: AuthenticatedMisPedidosRoute,
+  AuthenticatedPanelRoute: AuthenticatedPanelRouteWithChildren,
+  AuthenticatedPedidosRoute: AuthenticatedPedidosRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
