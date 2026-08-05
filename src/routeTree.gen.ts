@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedMisPedidosRouteImport } from './routes/_authenticated/mis-pedidos'
 import { Route as AuthenticatedPanelRouteImport } from './routes/_authenticated/panel'
 import { Route as AuthenticatedPedidosRouteImport } from './routes/_authenticated/pedidos'
+import { Route as AuthenticatedPanelIndexRouteImport } from './routes/_authenticated/panel.index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -45,20 +46,26 @@ const AuthenticatedPedidosRoute = AuthenticatedPedidosRouteImport.update({
   path: '/pedidos',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPanelIndexRoute = AuthenticatedPanelIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedPanelRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/mis-pedidos': typeof AuthenticatedMisPedidosRoute
-  '/panel': typeof AuthenticatedPanelRoute
+  '/panel': typeof AuthenticatedPanelRouteWithChildren
   '/pedidos': typeof AuthenticatedPedidosRoute
+  '/panel/': typeof AuthenticatedPanelIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/mis-pedidos': typeof AuthenticatedMisPedidosRoute
-  '/panel': typeof AuthenticatedPanelRoute
   '/pedidos': typeof AuthenticatedPedidosRoute
+  '/panel': typeof AuthenticatedPanelIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -66,14 +73,15 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/mis-pedidos': typeof AuthenticatedMisPedidosRoute
-  '/_authenticated/panel': typeof AuthenticatedPanelRoute
+  '/_authenticated/panel': typeof AuthenticatedPanelRouteWithChildren
   '/_authenticated/pedidos': typeof AuthenticatedPedidosRoute
+  '/_authenticated/panel/': typeof AuthenticatedPanelIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/mis-pedidos' | '/panel' | '/pedidos'
+  fullPaths: '/' | '/auth' | '/mis-pedidos' | '/panel' | '/pedidos' | '/panel/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/mis-pedidos' | '/panel' | '/pedidos'
+  to: '/' | '/auth' | '/mis-pedidos' | '/pedidos' | '/panel'
   id:
     | '__root__'
     | '/'
@@ -82,6 +90,7 @@ export interface FileRouteTypes {
     | '/_authenticated/mis-pedidos'
     | '/_authenticated/panel'
     | '/_authenticated/pedidos'
+    | '/_authenticated/panel/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -134,18 +143,36 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPedidosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/panel/': {
+      id: '/_authenticated/panel/'
+      path: '/'
+      fullPath: '/panel/'
+      preLoaderRoute: typeof AuthenticatedPanelIndexRouteImport
+      parentRoute: typeof AuthenticatedPanelRoute
+    }
   }
 }
 
+interface AuthenticatedPanelRouteChildren {
+  AuthenticatedPanelIndexRoute: typeof AuthenticatedPanelIndexRoute
+}
+
+const AuthenticatedPanelRouteChildren: AuthenticatedPanelRouteChildren = {
+  AuthenticatedPanelIndexRoute: AuthenticatedPanelIndexRoute,
+}
+
+const AuthenticatedPanelRouteWithChildren =
+  AuthenticatedPanelRoute._addFileChildren(AuthenticatedPanelRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedMisPedidosRoute: typeof AuthenticatedMisPedidosRoute
-  AuthenticatedPanelRoute: typeof AuthenticatedPanelRoute
+  AuthenticatedPanelRoute: typeof AuthenticatedPanelRouteWithChildren
   AuthenticatedPedidosRoute: typeof AuthenticatedPedidosRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMisPedidosRoute: AuthenticatedMisPedidosRoute,
-  AuthenticatedPanelRoute: AuthenticatedPanelRoute,
+  AuthenticatedPanelRoute: AuthenticatedPanelRouteWithChildren,
   AuthenticatedPedidosRoute: AuthenticatedPedidosRoute,
 }
 
