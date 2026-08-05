@@ -17,6 +17,8 @@ import { Route as AuthenticatedPanelRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedPedidosRouteImport } from './routes/_authenticated/pedidos'
 import { Route as AuthenticatedPanelIndexRouteImport } from './routes/_authenticated/panel.index'
 import { Route as AuthenticatedPanelClientesRouteImport } from './routes/_authenticated/panel.clientes'
+import { Route as AuthenticatedPanelCuentasRouteImport } from './routes/_authenticated/panel.cuentas'
+import { Route as AuthenticatedPanelPedidosRouteImport } from './routes/_authenticated/panel.pedidos'
 import { Route as AuthenticatedPanelProductosRouteImport } from './routes/_authenticated/panel.productos'
 
 const IndexRoute = IndexRouteImport.update({
@@ -59,6 +61,18 @@ const AuthenticatedPanelClientesRoute =
     path: '/clientes',
     getParentRoute: () => AuthenticatedPanelRoute,
   } as any)
+const AuthenticatedPanelCuentasRoute =
+  AuthenticatedPanelCuentasRouteImport.update({
+    id: '/cuentas',
+    path: '/cuentas',
+    getParentRoute: () => AuthenticatedPanelRoute,
+  } as any)
+const AuthenticatedPanelPedidosRoute =
+  AuthenticatedPanelPedidosRouteImport.update({
+    id: '/pedidos',
+    path: '/pedidos',
+    getParentRoute: () => AuthenticatedPanelRoute,
+  } as any)
 const AuthenticatedPanelProductosRoute =
   AuthenticatedPanelProductosRouteImport.update({
     id: '/productos',
@@ -73,6 +87,8 @@ export interface FileRoutesByFullPath {
   '/panel': typeof AuthenticatedPanelRouteWithChildren
   '/pedidos': typeof AuthenticatedPedidosRoute
   '/panel/clientes': typeof AuthenticatedPanelClientesRoute
+  '/panel/cuentas': typeof AuthenticatedPanelCuentasRoute
+  '/panel/pedidos': typeof AuthenticatedPanelPedidosRoute
   '/panel/productos': typeof AuthenticatedPanelProductosRoute
   '/panel/': typeof AuthenticatedPanelIndexRoute
 }
@@ -82,6 +98,8 @@ export interface FileRoutesByTo {
   '/mis-pedidos': typeof AuthenticatedMisPedidosRoute
   '/pedidos': typeof AuthenticatedPedidosRoute
   '/panel/clientes': typeof AuthenticatedPanelClientesRoute
+  '/panel/cuentas': typeof AuthenticatedPanelCuentasRoute
+  '/panel/pedidos': typeof AuthenticatedPanelPedidosRoute
   '/panel/productos': typeof AuthenticatedPanelProductosRoute
   '/panel': typeof AuthenticatedPanelIndexRoute
 }
@@ -94,6 +112,8 @@ export interface FileRoutesById {
   '/_authenticated/panel': typeof AuthenticatedPanelRouteWithChildren
   '/_authenticated/pedidos': typeof AuthenticatedPedidosRoute
   '/_authenticated/panel/clientes': typeof AuthenticatedPanelClientesRoute
+  '/_authenticated/panel/cuentas': typeof AuthenticatedPanelCuentasRoute
+  '/_authenticated/panel/pedidos': typeof AuthenticatedPanelPedidosRoute
   '/_authenticated/panel/productos': typeof AuthenticatedPanelProductosRoute
   '/_authenticated/panel/': typeof AuthenticatedPanelIndexRoute
 }
@@ -106,6 +126,8 @@ export interface FileRouteTypes {
     | '/panel'
     | '/pedidos'
     | '/panel/clientes'
+    | '/panel/cuentas'
+    | '/panel/pedidos'
     | '/panel/productos'
     | '/panel/'
   fileRoutesByTo: FileRoutesByTo
@@ -115,6 +137,8 @@ export interface FileRouteTypes {
     | '/mis-pedidos'
     | '/pedidos'
     | '/panel/clientes'
+    | '/panel/cuentas'
+    | '/panel/pedidos'
     | '/panel/productos'
     | '/panel'
   id:
@@ -126,6 +150,8 @@ export interface FileRouteTypes {
     | '/_authenticated/panel'
     | '/_authenticated/pedidos'
     | '/_authenticated/panel/clientes'
+    | '/_authenticated/panel/cuentas'
+    | '/_authenticated/panel/pedidos'
     | '/_authenticated/panel/productos'
     | '/_authenticated/panel/'
   fileRoutesById: FileRoutesById
@@ -194,6 +220,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPanelClientesRouteImport
       parentRoute: typeof AuthenticatedPanelRoute
     }
+    '/_authenticated/panel/cuentas': {
+      id: '/_authenticated/panel/cuentas'
+      path: '/cuentas'
+      fullPath: '/panel/cuentas'
+      preLoaderRoute: typeof AuthenticatedPanelCuentasRouteImport
+      parentRoute: typeof AuthenticatedPanelRoute
+    }
+    '/_authenticated/panel/pedidos': {
+      id: '/_authenticated/panel/pedidos'
+      path: '/pedidos'
+      fullPath: '/panel/pedidos'
+      preLoaderRoute: typeof AuthenticatedPanelPedidosRouteImport
+      parentRoute: typeof AuthenticatedPanelRoute
+    }
     '/_authenticated/panel/productos': {
       id: '/_authenticated/panel/productos'
       path: '/productos'
@@ -206,12 +246,16 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedPanelRouteChildren {
   AuthenticatedPanelClientesRoute: typeof AuthenticatedPanelClientesRoute
+  AuthenticatedPanelCuentasRoute: typeof AuthenticatedPanelCuentasRoute
+  AuthenticatedPanelPedidosRoute: typeof AuthenticatedPanelPedidosRoute
   AuthenticatedPanelProductosRoute: typeof AuthenticatedPanelProductosRoute
   AuthenticatedPanelIndexRoute: typeof AuthenticatedPanelIndexRoute
 }
 
 const AuthenticatedPanelRouteChildren: AuthenticatedPanelRouteChildren = {
   AuthenticatedPanelClientesRoute: AuthenticatedPanelClientesRoute,
+  AuthenticatedPanelCuentasRoute: AuthenticatedPanelCuentasRoute,
+  AuthenticatedPanelPedidosRoute: AuthenticatedPanelPedidosRoute,
   AuthenticatedPanelProductosRoute: AuthenticatedPanelProductosRoute,
   AuthenticatedPanelIndexRoute: AuthenticatedPanelIndexRoute,
 }
