@@ -38,7 +38,7 @@ function PedidosPanel() {
   });
 
   const cambiar = useMutation({
-    mutationFn: async ({ id, estado }: { id: string; estado: string }) => {
+    mutationFn: async ({ id, estado }: { id: string; estado: (typeof estados)[number] }) => {
       const { error } = await supabase.from("pedidos").update({ estado }).eq("id", id);
       if (error) throw error;
     },

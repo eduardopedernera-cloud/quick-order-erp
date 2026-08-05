@@ -44,12 +44,20 @@ function CuentasPage() {
   });
 
   const registrar = useMutation({
-    mutationFn: async ({ tipo, monto, detalle }: { tipo: string; monto: number; detalle: string }) => {
+    mutationFn: async ({
+      tipo,
+      monto,
+      concepto,
+    }: {
+      tipo: "debe" | "haber";
+      monto: number;
+      concepto: string;
+    }) => {
       const { error } = await supabase.from("movimientos_cc").insert({
         cliente_id: clienteId,
         tipo,
         monto,
-        detalle: detalle || null,
+        concepto: concepto || (tipo === "haber" ? "Pago recibido" : "Cargo manual"),
       });
       if (error) throw error;
     },
@@ -107,9 +115,9 @@ function CuentasPage() {
                   e.preventDefault();
                   const fd = new FormData(e.currentTarget);
                   registrar.mutate({
-                    tipo: String(fd.get("tipo")),
+                    tipo: fd.get("tipo") === "debe" ? "debe" : "haber",
                     monto: Number(fd.get("monto")),
-                    detalle: String(fd.get("detalle") ?? ""),
+                    concepto: String(fd.get("concepto") ?? ""),
                   });
                   e.currentTarget.reset();
                 }}
@@ -121,9 +129,8 @@ function CuentasPage() {
                     name="tipo"
                     className="h-10 w-full rounded-xl border border-input bg-background px-3 text-sm"
                   >
-                    <option value="pago">Pago / cobranza</option>
-                    <option value="cargo">Cargo manual</option>
-                    <option value="nota_credito">Nota de crédito</option>
+                    <option value="haber">Pago / cobranza</option>
+                    <option value="debe">Cargo manual</option>
                   </select>
                 </div>
                 <div className="space-y-1.5">
@@ -131,8 +138,8 @@ function CuentasPage() {
                   <Input id="monto" name="monto" type="number" step="any" required />
                 </div>
                 <div className="space-y-1.5 sm:col-span-2">
-                  <Label htmlFor="detalle">Detalle</Label>
-                  <Input id="detalle" name="detalle" placeholder="Efectivo, transferencia…" />
+                  <Label htmlFor="concepto">Concepto</Label>
+                  <Input id="concepto" name="concepto" placeholder="Efectivo, transferencia…" />
                 </div>
                 <Button type="submit" className="self-end rounded-full" disabled={registrar.isPending}>
                   Registrar
@@ -144,13 +151,18 @@ function CuentasPage() {
                   <li key={m.id} className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 py-2.5">
                     <div className="min-w-0">
                       <p className="truncate text-sm font-semibold capitalize">
-                        {String(m.tipo).replace("_", " ")}
+                        {m.tipo === "haber" ? "Pago" : "Cargo"}
                       </p>
                       <p className="truncate text-xs text-muted-foreground">
-                        {fecha(m.created_at)} {m.detalle ? `· ${m.detalle}` : ""}
+                        {fecha(m.created_at)} {m.concepto ? `· ${m.concepto}` : ""}
                       </p>
                     </div>
-                    <span className="shrink-0 text-sm font-bold">{money(m.monto)}</span>
+                    <span
+                      className={`shrink-0 text-sm font-bold ${m.tipo === "haber" ? "text-success" : "text-destructive"}`}
+                    >
+                      {m.tipo === "haber" ? "−" : "+"}
+                      {money(m.monto)}
+                    </span>
                   </li>
                 ))}
                 {!movimientos.length && (
