@@ -54,14 +54,14 @@ function ClientesPage() {
   const crear = useMutation({
     mutationFn: async (form: Record<string, string>) => {
       const { error } = await supabase.from("clientes").insert({
-        nombre: form.nombre,
-        razon_social: form.razon_social || null,
-        cuit: form.cuit || null,
-        telefono: form.telefono || null,
-        email: form.email || null,
-        direccion: form.direccion || null,
-        localidad: form.localidad || null,
-        limite_credito: Number(form.limite_credito || 0),
+        nombre: form["nombre"] ?? "",
+        razon_social: form["razon_social"] || null,
+        cuit: form["cuit"] || null,
+        telefono: form["telefono"] || null,
+        email: form["email"] || null,
+        direccion: form["direccion"] || null,
+        localidad: form["localidad"] || null,
+        limite_credito: Number(form["limite_credito"] || 0),
       });
       if (error) throw error;
     },
