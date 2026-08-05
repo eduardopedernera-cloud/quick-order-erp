@@ -13,10 +13,10 @@ export const Route = createFileRoute("/_authenticated/panel")({
 
 const nav = [
   { to: "/panel", label: "Resumen", icon: BarChart3, exact: true },
-  { to: "/panel/clientes", label: "Clientes", icon: Users },
-  { to: "/panel/productos", label: "Productos", icon: Boxes },
-  { to: "/panel/pedidos", label: "Pedidos", icon: ShoppingBag },
-  { to: "/panel/cuentas", label: "Cuentas corrientes", icon: Wallet },
+  { to: "/panel/clientes", label: "Clientes", icon: Users, exact: false },
+  { to: "/panel/productos", label: "Productos", icon: Boxes, exact: false },
+  { to: "/panel/pedidos", label: "Pedidos", icon: ShoppingBag, exact: false },
+  { to: "/panel/cuentas", label: "Cuentas corrientes", icon: Wallet, exact: false },
 ] as const;
 
 function PanelLayout() {

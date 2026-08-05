@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedMisPedidosRouteImport } from './routes/_authenticated/mis-pedidos'
+import { Route as AuthenticatedPanelRouteImport } from './routes/_authenticated/panel'
 import { Route as AuthenticatedPedidosRouteImport } from './routes/_authenticated/pedidos'
 
 const IndexRoute = IndexRouteImport.update({
@@ -34,6 +35,11 @@ const AuthenticatedMisPedidosRoute = AuthenticatedMisPedidosRouteImport.update({
   path: '/mis-pedidos',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPanelRoute = AuthenticatedPanelRouteImport.update({
+  id: '/panel',
+  path: '/panel',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedPedidosRoute = AuthenticatedPedidosRouteImport.update({
   id: '/pedidos',
   path: '/pedidos',
@@ -44,12 +50,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/mis-pedidos': typeof AuthenticatedMisPedidosRoute
+  '/panel': typeof AuthenticatedPanelRoute
   '/pedidos': typeof AuthenticatedPedidosRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/mis-pedidos': typeof AuthenticatedMisPedidosRoute
+  '/panel': typeof AuthenticatedPanelRoute
   '/pedidos': typeof AuthenticatedPedidosRoute
 }
 export interface FileRoutesById {
@@ -58,19 +66,21 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/mis-pedidos': typeof AuthenticatedMisPedidosRoute
+  '/_authenticated/panel': typeof AuthenticatedPanelRoute
   '/_authenticated/pedidos': typeof AuthenticatedPedidosRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/mis-pedidos' | '/pedidos'
+  fullPaths: '/' | '/auth' | '/mis-pedidos' | '/panel' | '/pedidos'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/mis-pedidos' | '/pedidos'
+  to: '/' | '/auth' | '/mis-pedidos' | '/panel' | '/pedidos'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/mis-pedidos'
+    | '/_authenticated/panel'
     | '/_authenticated/pedidos'
   fileRoutesById: FileRoutesById
 }
@@ -110,6 +120,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMisPedidosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/panel': {
+      id: '/_authenticated/panel'
+      path: '/panel'
+      fullPath: '/panel'
+      preLoaderRoute: typeof AuthenticatedPanelRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/pedidos': {
       id: '/_authenticated/pedidos'
       path: '/pedidos'
@@ -122,11 +139,13 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedMisPedidosRoute: typeof AuthenticatedMisPedidosRoute
+  AuthenticatedPanelRoute: typeof AuthenticatedPanelRoute
   AuthenticatedPedidosRoute: typeof AuthenticatedPedidosRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMisPedidosRoute: AuthenticatedMisPedidosRoute,
+  AuthenticatedPanelRoute: AuthenticatedPanelRoute,
   AuthenticatedPedidosRoute: AuthenticatedPedidosRoute,
 }
 
