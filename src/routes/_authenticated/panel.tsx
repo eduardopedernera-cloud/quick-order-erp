@@ -1,6 +1,15 @@
 import { Link, Outlet, createFileRoute, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { BarChart3, Boxes, LogOut, ShoppingBag, Users, Wallet } from "lucide-react";
+import {
+  BarChart3,
+  Boxes,
+  LogOut,
+  ShoppingBag,
+  Truck,
+  Users,
+  Wallet,
+  Warehouse,
+} from "lucide-react";
 
 import { BottomNav } from "@/components/bottom-nav";
 import { usePerfil } from "@/hooks/use-session";
