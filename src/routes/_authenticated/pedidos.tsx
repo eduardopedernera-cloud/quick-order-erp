@@ -115,7 +115,7 @@ function TomaPedidos() {
       const { data, error } = await supabase.rpc("crear_pedido", {
         p_cliente_id: clienteEfectivo,
         p_items: items.map((i) => ({ producto_id: i.id, cantidad: i.cantidad })),
-        p_observaciones: observaciones || null,
+        p_observaciones: observaciones || undefined,
       });
       if (error) throw error;
       const fila = Array.isArray(data) ? data[0] : data;
