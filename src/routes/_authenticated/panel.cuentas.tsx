@@ -48,16 +48,22 @@ function CuentasPage() {
       tipo,
       monto,
       concepto,
+      metodo_pago,
+      referencia,
     }: {
       tipo: "debe" | "haber";
       monto: number;
       concepto: string;
+      metodo_pago: string;
+      referencia: string;
     }) => {
       const { error } = await supabase.from("movimientos_cc").insert({
         cliente_id: clienteId,
         tipo,
         monto,
         concepto: concepto || (tipo === "haber" ? "Pago recibido" : "Cargo manual"),
+        metodo_pago: tipo === "haber" ? metodo_pago : null,
+        referencia: referencia || null,
       });
       if (error) throw error;
     },
