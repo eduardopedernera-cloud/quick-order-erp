@@ -26,6 +26,8 @@ const nav = [
   { to: "/panel/productos", label: "Productos", icon: Boxes, exact: false },
   { to: "/panel/pedidos", label: "Pedidos", icon: ShoppingBag, exact: false },
   { to: "/panel/cuentas", label: "Cuentas corrientes", icon: Wallet, exact: false },
+  { to: "/panel/proveedores", label: "Proveedores", icon: Truck, exact: false },
+  { to: "/panel/compras", label: "Compras", icon: Warehouse, exact: false },
 ] as const;
 
 function PanelLayout() {
