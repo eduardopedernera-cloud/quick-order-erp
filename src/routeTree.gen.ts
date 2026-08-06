@@ -20,6 +20,7 @@ import { Route as AuthenticatedPanelClientesRouteImport } from './routes/_authen
 import { Route as AuthenticatedPanelCuentasRouteImport } from './routes/_authenticated/panel.cuentas'
 import { Route as AuthenticatedPanelPedidosRouteImport } from './routes/_authenticated/panel.pedidos'
 import { Route as AuthenticatedPanelProductosRouteImport } from './routes/_authenticated/panel.productos'
+import { Route as AuthenticatedPanelProveedoresRouteImport } from './routes/_authenticated/panel.proveedores'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -79,6 +80,12 @@ const AuthenticatedPanelProductosRoute =
     path: '/productos',
     getParentRoute: () => AuthenticatedPanelRoute,
   } as any)
+const AuthenticatedPanelProveedoresRoute =
+  AuthenticatedPanelProveedoresRouteImport.update({
+    id: '/proveedores',
+    path: '/proveedores',
+    getParentRoute: () => AuthenticatedPanelRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -90,6 +97,7 @@ export interface FileRoutesByFullPath {
   '/panel/cuentas': typeof AuthenticatedPanelCuentasRoute
   '/panel/pedidos': typeof AuthenticatedPanelPedidosRoute
   '/panel/productos': typeof AuthenticatedPanelProductosRoute
+  '/panel/proveedores': typeof AuthenticatedPanelProveedoresRoute
   '/panel/': typeof AuthenticatedPanelIndexRoute
 }
 export interface FileRoutesByTo {
@@ -101,6 +109,7 @@ export interface FileRoutesByTo {
   '/panel/cuentas': typeof AuthenticatedPanelCuentasRoute
   '/panel/pedidos': typeof AuthenticatedPanelPedidosRoute
   '/panel/productos': typeof AuthenticatedPanelProductosRoute
+  '/panel/proveedores': typeof AuthenticatedPanelProveedoresRoute
   '/panel': typeof AuthenticatedPanelIndexRoute
 }
 export interface FileRoutesById {
@@ -115,6 +124,7 @@ export interface FileRoutesById {
   '/_authenticated/panel/cuentas': typeof AuthenticatedPanelCuentasRoute
   '/_authenticated/panel/pedidos': typeof AuthenticatedPanelPedidosRoute
   '/_authenticated/panel/productos': typeof AuthenticatedPanelProductosRoute
+  '/_authenticated/panel/proveedores': typeof AuthenticatedPanelProveedoresRoute
   '/_authenticated/panel/': typeof AuthenticatedPanelIndexRoute
 }
 export interface FileRouteTypes {
@@ -129,6 +139,7 @@ export interface FileRouteTypes {
     | '/panel/cuentas'
     | '/panel/pedidos'
     | '/panel/productos'
+    | '/panel/proveedores'
     | '/panel/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -140,6 +151,7 @@ export interface FileRouteTypes {
     | '/panel/cuentas'
     | '/panel/pedidos'
     | '/panel/productos'
+    | '/panel/proveedores'
     | '/panel'
   id:
     | '__root__'
@@ -153,6 +165,7 @@ export interface FileRouteTypes {
     | '/_authenticated/panel/cuentas'
     | '/_authenticated/panel/pedidos'
     | '/_authenticated/panel/productos'
+    | '/_authenticated/panel/proveedores'
     | '/_authenticated/panel/'
   fileRoutesById: FileRoutesById
 }
@@ -241,6 +254,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPanelProductosRouteImport
       parentRoute: typeof AuthenticatedPanelRoute
     }
+    '/_authenticated/panel/proveedores': {
+      id: '/_authenticated/panel/proveedores'
+      path: '/proveedores'
+      fullPath: '/panel/proveedores'
+      preLoaderRoute: typeof AuthenticatedPanelProveedoresRouteImport
+      parentRoute: typeof AuthenticatedPanelRoute
+    }
   }
 }
 
@@ -249,6 +269,7 @@ interface AuthenticatedPanelRouteChildren {
   AuthenticatedPanelCuentasRoute: typeof AuthenticatedPanelCuentasRoute
   AuthenticatedPanelPedidosRoute: typeof AuthenticatedPanelPedidosRoute
   AuthenticatedPanelProductosRoute: typeof AuthenticatedPanelProductosRoute
+  AuthenticatedPanelProveedoresRoute: typeof AuthenticatedPanelProveedoresRoute
   AuthenticatedPanelIndexRoute: typeof AuthenticatedPanelIndexRoute
 }
 
@@ -257,6 +278,7 @@ const AuthenticatedPanelRouteChildren: AuthenticatedPanelRouteChildren = {
   AuthenticatedPanelCuentasRoute: AuthenticatedPanelCuentasRoute,
   AuthenticatedPanelPedidosRoute: AuthenticatedPanelPedidosRoute,
   AuthenticatedPanelProductosRoute: AuthenticatedPanelProductosRoute,
+  AuthenticatedPanelProveedoresRoute: AuthenticatedPanelProveedoresRoute,
   AuthenticatedPanelIndexRoute: AuthenticatedPanelIndexRoute,
 }
 

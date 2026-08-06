@@ -31,15 +31,15 @@ function ProveedoresPage() {
   });
 
   const crear = useMutation({
-    mutationFn: async (valores: Record<string, string>) => {
+    mutationFn: async (v: Record<string, string>) => {
       const { error } = await supabase.from("proveedores").insert({
-        nombre: valores.nombre,
-        razon_social: valores.razon_social || null,
-        cuit: valores.cuit || null,
-        contacto: valores.contacto || null,
-        telefono: valores.telefono || null,
-        email: valores.email || null,
-        direccion: valores.direccion || null,
+        nombre: v["nombre"] ?? "",
+        razon_social: v["razon_social"] || null,
+        cuit: v["cuit"] || null,
+        contacto: v["contacto"] || null,
+        telefono: v["telefono"] || null,
+        email: v["email"] || null,
+        direccion: v["direccion"] || null,
       });
       if (error) throw error;
     },
