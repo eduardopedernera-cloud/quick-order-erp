@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Minus, Plus, Search, ShoppingCart, Trash2, X } from "lucide-react";
+import { Minus, Package, Plus, Search, Send, ShoppingCart, Trash2, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -13,6 +13,7 @@ import { usePerfil } from "@/hooks/use-session";
 import { supabase } from "@/integrations/supabase/client";
 import { money } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { enviarPedidoWhatsApp } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/_authenticated/pedidos")({
   head: () => ({
@@ -50,7 +51,9 @@ function TomaPedidos() {
       (
         await supabase
           .from("productos")
-          .select("id, nombre, marca, codigo, precio_venta, stock, unidad, unidades_por_bulto, categoria_id")
+          .select(
+            "id, nombre, marca, codigo, precio_venta, stock, unidad, unidades_por_bulto, categoria_id, imagen_url",
+          )
           .eq("activo", true)
           .order("nombre")
       ).data ?? [],
@@ -59,11 +62,19 @@ function TomaPedidos() {
   const { data: clientes = [] } = useQuery({
     queryKey: ["clientes-select"],
     queryFn: async () =>
-      (await supabase.from("clientes").select("id, nombre, saldo").eq("activo", true).order("nombre"))
-        .data ?? [],
+      (
+        await supabase
+          .from("clientes")
+          .select("id, nombre, saldo, limite_credito")
+          .eq("activo", true)
+          .order("nombre")
+      ).data ?? [],
   });
 
   const clienteEfectivo = perfil?.esStaff ? clienteId : (perfil?.perfil?.cliente_id ?? "");
+  const cliente = clientes.find((c) => c.id === clienteEfectivo);
+  const limite = Number(cliente?.limite_credito ?? 0);
+  const disponible = limite > 0 ? Math.max(limite - Number(cliente?.saldo ?? 0), 0) : null;
 
   const filtrados = useMemo(() => {
     const q = busqueda.trim().toLowerCase();
@@ -80,6 +91,7 @@ function TomaPedidos() {
   const items = Object.values(carrito);
   const total = items.reduce((acc, i) => acc + i.precio * i.cantidad, 0);
   const unidades = items.reduce((acc, i) => acc + i.cantidad, 0);
+  const excedeCredito = disponible !== null && total > disponible;
 
   function sumar(p: (typeof productos)[number], delta: number) {
     setCarrito((prev) => {
@@ -100,43 +112,36 @@ function TomaPedidos() {
     mutationFn: async () => {
       if (!clienteEfectivo) throw new Error("Elegí un cliente para el pedido");
       if (!items.length) throw new Error("El carrito está vacío");
-      const { data: pedido, error } = await supabase
-        .from("pedidos")
-        .insert({
-          cliente_id: clienteEfectivo,
-          vendedor_id: (await supabase.auth.getUser()).data.user?.id ?? null,
-          subtotal: total,
-          total,
-          observaciones: observaciones || null,
-        })
-        .select("id, numero")
-        .single();
-      if (error) throw error;
-
-      const { error: errItems } = await supabase.from("pedido_items").insert(
-        items.map((i) => ({
-          pedido_id: pedido.id,
-          producto_id: i.id,
-          nombre_producto: i.nombre,
-          cantidad: i.cantidad,
-          precio_unitario: i.precio,
-          subtotal: i.precio * i.cantidad,
-        })),
-      );
-      if (errItems) throw errItems;
-
-      await supabase.from("movimientos_cc").insert({
-        cliente_id: clienteEfectivo,
-        tipo: "debe",
-        monto: total,
-        concepto: `Pedido #${pedido.numero}`,
-        pedido_id: pedido.id,
+      const { data, error } = await supabase.rpc("crear_pedido", {
+        p_cliente_id: clienteEfectivo,
+        p_items: items.map((i) => ({ producto_id: i.id, cantidad: i.cantidad })),
+        p_observaciones: observaciones || "",
       });
-
-      return pedido;
+      if (error) throw error;
+      const fila = Array.isArray(data) ? data[0] : data;
+      return fila as { pedido_id: string; numero: number };
     },
     onSuccess: (pedido) => {
-      toast.success(`Pedido #${pedido.numero} confirmado`);
+      toast.success(`Pedido #${pedido.numero} confirmado`, {
+        action: {
+          label: "WhatsApp",
+          onClick: () =>
+            enviarPedidoWhatsApp({
+              numero: pedido.numero,
+              cliente: cliente?.nombre ?? "Cliente",
+              items,
+              total,
+              observaciones,
+            }),
+        },
+      });
+      enviarPedidoWhatsApp({
+        numero: pedido.numero,
+        cliente: cliente?.nombre ?? "Cliente",
+        items,
+        total,
+        observaciones,
+      });
       setCarrito({});
       setObservaciones("");
       setAbierto(false);
@@ -202,54 +207,97 @@ function TomaPedidos() {
           </div>
         )}
 
+        {cliente && (
+          <p className="mb-4 rounded-2xl border border-border bg-card px-4 py-3 text-xs text-muted-foreground shadow-soft">
+            Crédito disponible{" "}
+            <span
+              className={cn(
+                "font-extrabold",
+                excedeCredito ? "text-destructive" : "text-foreground",
+              )}
+            >
+              {disponible === null ? "sin límite" : money(disponible)}
+            </span>
+          </p>
+        )}
+
         {isLoading ? (
           <p className="py-16 text-center text-sm text-muted-foreground">Cargando catálogo…</p>
         ) : (
           <ul className="space-y-2">
             {filtrados.map((p) => {
               const cantidad = carrito[p.id]?.cantidad ?? 0;
+              const bulto = Number(p.unidades_por_bulto) || 1;
               return (
                 <li
                   key={p.id}
                   className={cn(
-                    "grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border bg-card p-3.5 shadow-soft transition-colors",
+                    "grid grid-cols-[auto_minmax(0,1fr)] gap-3 rounded-2xl border bg-card p-3.5 shadow-soft transition-colors",
                     cantidad ? "border-primary/40 bg-accent/40" : "border-border",
                   )}
                 >
+                  <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-accent">
+                    {p.imagen_url ? (
+                      <img
+                        src={p.imagen_url}
+                        alt={p.nombre}
+                        loading="lazy"
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <span className="flex h-full w-full items-center justify-center text-accent-foreground">
+                        <Package className="h-6 w-6" />
+                      </span>
+                    )}
+                  </div>
                   <div className="min-w-0">
                     <p className="truncate text-sm font-semibold">{p.nombre}</p>
                     <p className="mt-0.5 truncate text-xs text-muted-foreground">
                       {p.marca ?? "Sin marca"} · {p.unidad}
-                      {p.unidades_por_bulto > 1 ? ` x${p.unidades_por_bulto}` : ""} · stock{" "}
-                      {Number(p.stock)}
+                      {bulto > 1 ? ` · bulto x${bulto}` : ""} · stock {Number(p.stock)}
                     </p>
                     <p className="mt-1 text-base font-extrabold text-primary">
                       {money(p.precio_venta)}
+                      {bulto > 1 && (
+                        <span className="ml-2 text-xs font-semibold text-muted-foreground">
+                          bulto {money(Number(p.precio_venta) * bulto)}
+                        </span>
+                      )}
                     </p>
-                  </div>
-                  <div className="flex shrink-0 items-center gap-1.5">
-                    {cantidad > 0 && (
-                      <>
+
+                    <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                      {cantidad > 0 && (
+                        <>
+                          <Button
+                            size="icon"
+                            variant="outline"
+                            className="h-9 w-9 rounded-full"
+                            onClick={() => sumar(p, -1)}
+                            aria-label="Quitar una unidad"
+                          >
+                            <Minus className="h-4 w-4" />
+                          </Button>
+                          <span className="w-7 text-center text-sm font-bold">{cantidad}</span>
+                        </>
+                      )}
+                      <Button
+                        size="icon"
+                        className="h-9 w-9 rounded-full"
+                        onClick={() => sumar(p, 1)}
+                        aria-label="Agregar una unidad"
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                      {bulto > 1 && (
                         <Button
-                          size="icon"
                           variant="outline"
-                          className="h-9 w-9 rounded-full"
-                          onClick={() => sumar(p, -1)}
-                          aria-label="Quitar una unidad"
+                          className="h-9 rounded-full px-3 text-xs font-semibold"
+                          onClick={() => sumar(p, bulto)}
                         >
-                          <Minus className="h-4 w-4" />
+                          + bulto ({bulto})
                         </Button>
-                        <span className="w-7 text-center text-sm font-bold">{cantidad}</span>
-                      </>
-                    )}
-                    <Button
-                      size="icon"
-                      className="h-9 w-9 rounded-full"
-                      onClick={() => sumar(p, 1)}
-                      aria-label="Agregar una unidad"
-                    >
-                      <Plus className="h-4 w-4" />
-                    </Button>
+                      )}
+                    </div>
                   </div>
                 </li>
               );
@@ -317,6 +365,12 @@ function TomaPedidos() {
               <span className="text-2xl font-extrabold">{money(total)}</span>
             </div>
 
+            {excedeCredito && (
+              <p className="rounded-xl bg-destructive/10 px-3 py-2 text-xs font-semibold text-destructive">
+                El pedido supera el crédito disponible ({money(disponible ?? 0)}).
+              </p>
+            )}
+
             <div className="flex gap-2">
               <Button
                 variant="outline"
@@ -327,11 +381,12 @@ function TomaPedidos() {
                 <X className="h-4 w-4" />
               </Button>
               <Button
-                className="h-12 flex-1 rounded-full text-base font-bold"
-                disabled={confirmar.isPending}
+                className="h-12 flex-1 gap-2 rounded-full text-base font-bold"
+                disabled={confirmar.isPending || excedeCredito}
                 onClick={() => confirmar.mutate()}
               >
-                {confirmar.isPending ? "Confirmando…" : "Confirmar pedido"}
+                <Send className="h-4 w-4" />
+                {confirmar.isPending ? "Confirmando…" : "Confirmar y enviar"}
               </Button>
             </div>
           </div>

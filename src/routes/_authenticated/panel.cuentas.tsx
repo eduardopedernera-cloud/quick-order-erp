@@ -48,16 +48,22 @@ function CuentasPage() {
       tipo,
       monto,
       concepto,
+      metodo_pago,
+      referencia,
     }: {
       tipo: "debe" | "haber";
       monto: number;
       concepto: string;
+      metodo_pago: string;
+      referencia: string;
     }) => {
       const { error } = await supabase.from("movimientos_cc").insert({
         cliente_id: clienteId,
         tipo,
         monto,
         concepto: concepto || (tipo === "haber" ? "Pago recibido" : "Cargo manual"),
+        metodo_pago: tipo === "haber" ? metodo_pago : null,
+        referencia: referencia || null,
       });
       if (error) throw error;
     },
@@ -118,6 +124,8 @@ function CuentasPage() {
                     tipo: fd.get("tipo") === "debe" ? "debe" : "haber",
                     monto: Number(fd.get("monto")),
                     concepto: String(fd.get("concepto") ?? ""),
+                    metodo_pago: String(fd.get("metodo_pago") ?? "efectivo"),
+                    referencia: String(fd.get("referencia") ?? ""),
                   });
                   e.currentTarget.reset();
                 }}
@@ -137,10 +145,28 @@ function CuentasPage() {
                   <Label htmlFor="monto">Monto</Label>
                   <Input id="monto" name="monto" type="number" step="any" required />
                 </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="metodo_pago">Método de pago</Label>
+                  <select
+                    id="metodo_pago"
+                    name="metodo_pago"
+                    className="h-10 w-full rounded-xl border border-input bg-background px-3 text-sm"
+                  >
+                    <option value="efectivo">Efectivo</option>
+                    <option value="transferencia">Transferencia</option>
+                    <option value="cheque">Cheque</option>
+                    <option value="otro">Otro</option>
+                  </select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="referencia">Referencia</Label>
+                  <Input id="referencia" name="referencia" placeholder="N° cheque / CBU / recibo" />
+                </div>
                 <div className="space-y-1.5 sm:col-span-2">
                   <Label htmlFor="concepto">Concepto</Label>
-                  <Input id="concepto" name="concepto" placeholder="Efectivo, transferencia…" />
+                  <Input id="concepto" name="concepto" placeholder="Cobranza semanal…" />
                 </div>
+
                 <Button type="submit" className="self-end rounded-full" disabled={registrar.isPending}>
                   Registrar
                 </Button>

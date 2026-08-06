@@ -194,8 +194,10 @@ export type Database = {
           created_at: string
           fecha: string
           id: string
+          metodo_pago: string | null
           monto: number
           pedido_id: string | null
+          referencia: string | null
           tipo: Database["public"]["Enums"]["movimiento_tipo"]
         }
         Insert: {
@@ -204,8 +206,10 @@ export type Database = {
           created_at?: string
           fecha?: string
           id?: string
+          metodo_pago?: string | null
           monto: number
           pedido_id?: string | null
+          referencia?: string | null
           tipo: Database["public"]["Enums"]["movimiento_tipo"]
         }
         Update: {
@@ -214,8 +218,10 @@ export type Database = {
           created_at?: string
           fecha?: string
           id?: string
+          metodo_pago?: string | null
           monto?: number
           pedido_id?: string | null
+          referencia?: string | null
           tipo?: Database["public"]["Enums"]["movimiento_tipo"]
         }
         Relationships: [
@@ -520,6 +526,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      crear_pedido: {
+        Args: { p_cliente_id: string; p_items: Json; p_observaciones?: string }
+        Returns: {
+          numero: number
+          pedido_id: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -529,6 +542,7 @@ export type Database = {
       }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
       my_cliente_id: { Args: never; Returns: string }
+      recibir_compra: { Args: { p_compra_id: string }; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "vendedor" | "cliente"
