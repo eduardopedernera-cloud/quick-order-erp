@@ -1,14 +1,18 @@
-# Welcome to your Lovable project
+# Wholesale Hub
+
+Actúa como un arquitecto de software experto en desarrollo Full-Stack. Necesito construir una aplicación web integral para una distribuidora mayorista que combine un Panel ERP de gestión interna y una App de Toma de Pedidos ultra rápida optimizada para dispositivos móviles (inspirada en la interfaz limpia y fluida de frambuesa.app).
+
+​La aplicación debe desarrollarse con React, Tailwind CSS y conectarse a Supabase usando la estructura de base de datos provista (Clientes, Proveedores, Compras, Productos, Cuentas Corrientes y Pedidos).
 
 This project was built with [Lovable](https://lovable.dev).
 
 ## Build with Lovable
 
-Open your project in the [Lovable editor](https://lovable.dev) and keep building.
+Continue developing this project in the [Lovable editor](https://lovable.dev/projects/b70df63e-e3d5-4a5f-8e81-83cb64dfa8b6).
 
 - **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: connect the project to GitHub and every change made in Lovable is committed straight to your repository.
-- **Full ownership**: this code is yours. Push to your repository and your changes sync back into Lovable, ready for your next prompt.
+- **Stay in sync**: every change made in Lovable is committed straight to this repository.
+- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
 
 ## Development
 
@@ -20,10 +24,3 @@ cd <repository-name>
 npm i
 npm run dev
 ```
-
-## Built with
-
-- TanStack Start
-- TypeScript
-- React
-- Tailwind CSS
