@@ -27,7 +27,7 @@ function Resumen() {
           .select("id, numero, total, estado, created_at, clientes(nombre)")
           .order("created_at", { ascending: false })
           .limit(200),
-        supabase.from("clientes").select("id, nombre, saldo"),
+        supabase.from("clientes").select("id, nombre, saldo, limite_credito"),
         supabase.from("productos").select("id, nombre, stock, stock_minimo").eq("activo", true),
       ]);
       return {
