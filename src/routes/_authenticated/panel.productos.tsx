@@ -4,6 +4,7 @@ import { Plus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { ImportarProductos } from "@/components/importar-productos";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
