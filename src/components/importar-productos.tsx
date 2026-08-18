@@ -218,10 +218,21 @@ export function ImportarProductos({ onListo }: { onListo: () => void }) {
       return;
     }
     setGuardando(true);
-    const { error } = await supabase
-
+    const codigos = filas.map((f) => f.codigo);
+    const { data: existentes } = await supabase
       .from("productos")
-      .upsert(filas, { onConflict: "codigo", ignoreDuplicates: false });
+      .select("codigo, atributos")
+      .in("codigo", codigos);
+    const previos = new Map(
+      (existentes ?? []).map((p) => [p.codigo, (p.atributos ?? {}) as Record<string, unknown>]),
+    );
+    const payload = filas.map((f) => ({
+      ...f,
+      atributos: { ...(previos.get(f.codigo) ?? {}), ...f.atributos },
+    }));
+    const { error } = await supabase
+      .from("productos")
+      .upsert(payload, { onConflict: "codigo", ignoreDuplicates: false });
     setGuardando(false);
     if (error) {
       toast.error(error.message);
