@@ -1,9 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { Plus } from "lucide-react";
+import { FileDown, Plus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { CampoImagenProducto, ImagenProducto } from "@/components/imagen-producto";
 import { ImportarProductos } from "@/components/importar-productos";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,6 +18,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { money, num } from "@/lib/format";
+import { useImagenesFirmadas } from "@/lib/imagenes";
+import { descargarCatalogoPdf } from "@/lib/pdf-productos";
 
 export const Route = createFileRoute("/_authenticated/panel/productos")({
   head: () => ({
