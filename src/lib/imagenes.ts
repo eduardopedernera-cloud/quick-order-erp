@@ -19,7 +19,7 @@ export async function subirImagenProducto(file: File, referencia: string) {
   const path = `${limpio || "producto"}-${Date.now()}.${ext}`;
   const { error } = await supabase.storage
     .from(BUCKET_PRODUCTOS)
-    .upload(path, file, { upsert: true, contentType: file.type || undefined });
+    .upload(path, file, { upsert: true, contentType: file.type || "image/jpeg" });
   if (error) throw error;
   return path;
 }
