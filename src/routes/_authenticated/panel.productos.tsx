@@ -141,6 +141,7 @@ function ProductosPage() {
             </form>
           </DialogContent>
         </Dialog>
+        </div>
       </header>
 
       <Input
