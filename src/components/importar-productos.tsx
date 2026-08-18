@@ -109,18 +109,29 @@ const numero = (v: unknown) => {
   return Number.isFinite(n) ? n : 0;
 };
 
+const claveExtra = (v: unknown) => sinAcentos(v).replace(/ /g, "_");
+
+const esNumerico = (v: unknown) => {
+  const s = String(v ?? "").trim();
+  if (!s) return false;
+  return /^[$\s]*-?[\d.,\s]+%?$/.test(s);
+};
+
 function normalizar(matriz: unknown[][]): Fila[] {
   const datos = matriz.filter((f) => f.some((c) => String(c ?? "").trim() !== ""));
   if (!datos.length) return [];
 
   // buscar la fila de encabezados dentro de las primeras filas
   let indiceCabecera = -1;
-  let columnas: (keyof Fila | null)[] = [];
+  let columnas: (Campo | null)[] = [];
+  let extras: (string | null)[] = [];
   for (let i = 0; i < Math.min(datos.length, 5); i++) {
-    const mapa = (datos[i] ?? []).map(claveColumna);
+    const fila = datos[i] ?? [];
+    const mapa = fila.map(claveColumna);
     if (mapa.filter(Boolean).length >= 2) {
       indiceCabecera = i;
       columnas = mapa;
+      extras = fila.map((c, j) => (mapa[j] ? null : claveExtra(c) || null));
       break;
     }
   }
@@ -128,7 +139,7 @@ function normalizar(matriz: unknown[][]): Fila[] {
   const filas = indiceCabecera >= 0 ? datos.slice(indiceCabecera + 1) : datos;
   if (indiceCabecera < 0) {
     const ancho = Math.max(...datos.map((f) => f.length));
-    const base: (keyof Fila | null)[] = [
+    const base: (Campo | null)[] = [
       "codigo",
       "nombre",
       "marca",
@@ -137,13 +148,22 @@ function normalizar(matriz: unknown[][]): Fila[] {
       "stock",
     ];
     columnas = Array.from({ length: ancho }, (_, i) => base[i] ?? null);
+    extras = Array.from({ length: ancho }, () => null);
   }
 
   return filas
     .map((f) => {
       const o: Record<string, unknown> = {};
+      const atributos: Record<string, string | number> = {};
       columnas.forEach((k, i) => {
         if (k && o[k] === undefined) o[k] = f[i];
+      });
+      extras.forEach((k, i) => {
+        if (!k) return;
+        const bruto = f[i];
+        const s = String(bruto ?? "").trim();
+        if (!s) return;
+        atributos[k] = typeof bruto === "number" || esNumerico(bruto) ? numero(bruto) : s;
       });
       const codigo = String(o["codigo"] ?? "").trim();
       const nombre = String(o["nombre"] ?? "").trim();
@@ -158,6 +178,7 @@ function normalizar(matriz: unknown[][]): Fila[] {
         precio_venta: numero(o["precio_venta"]),
         stock: numero(o["stock"]),
         stock_minimo: numero(o["stock_minimo"]),
+        atributos,
       } satisfies Fila;
     })
     .filter((f): f is Fila => f !== null);
