@@ -269,7 +269,7 @@ export function ImportarProductos({ onListo }: { onListo: () => void }) {
 
           <Button
             className="w-full rounded-full"
-            disabled={!filas.length || guardando}
+            disabled={guardando || (!filas.length && !texto.trim())}
             onClick={() => void guardar()}
           >
             {guardando ? "Importando…" : "Importar y actualizar"}
