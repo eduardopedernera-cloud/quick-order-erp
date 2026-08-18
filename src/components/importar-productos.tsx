@@ -23,7 +23,10 @@ type Fila = {
   precio_venta: number;
   stock: number;
   stock_minimo: number;
+  atributos: Record<string, string | number>;
 };
+
+type Campo = Exclude<keyof Fila, "atributos">;
 
 const ALIAS: Record<string, keyof Fila> = {
   codigo: "codigo",
