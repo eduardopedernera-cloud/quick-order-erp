@@ -86,6 +86,8 @@ function ProductosPage() {
     <div className="mx-auto max-w-5xl px-4 py-6 md:px-8">
       <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
         <h1 className="truncate text-2xl font-extrabold tracking-tight">Productos</h1>
+        <div className="flex shrink-0 gap-2">
+        <ImportarProductos onListo={() => qc.invalidateQueries({ queryKey: ["productos"] })} />
         <Dialog open={abierto} onOpenChange={setAbierto}>
           <DialogTrigger asChild>
             <Button className="shrink-0 rounded-full">
