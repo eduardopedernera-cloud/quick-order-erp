@@ -28,7 +28,7 @@ type Fila = {
 
 type Campo = Exclude<keyof Fila, "atributos">;
 
-const ALIAS: Record<string, keyof Fila> = {
+const ALIAS: Record<string, Campo> = {
   codigo: "codigo",
   cod: "codigo",
   art: "codigo",
@@ -71,7 +71,7 @@ const sinAcentos = (v: unknown) =>
     .trim()
     .toLowerCase();
 
-const claveColumna = (v: unknown): keyof Fila | null => {
+const claveColumna = (v: unknown): Campo | null => {
   const k = sinAcentos(v);
   if (!k) return null;
   if (ALIAS[k]) return ALIAS[k]!;
