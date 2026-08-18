@@ -27,61 +27,127 @@ type Fila = {
 
 const ALIAS: Record<string, keyof Fila> = {
   codigo: "codigo",
-  código: "codigo",
   cod: "codigo",
+  art: "codigo",
+  articulo: "codigo",
   sku: "codigo",
   nombre: "nombre",
   producto: "nombre",
   descripcion: "nombre",
-  descripción: "nombre",
+  detalle: "nombre",
   marca: "marca",
+  empresa: "marca",
+  proveedor: "marca",
   unidad: "unidad",
   unidades_por_bulto: "unidades_por_bulto",
   "unidades por bulto": "unidades_por_bulto",
   bulto: "unidades_por_bulto",
   precio_costo: "precio_costo",
   costo: "precio_costo",
+  "costo final": "precio_costo",
+  "precio costo": "precio_costo",
   precio_venta: "precio_venta",
   precio: "precio_venta",
   venta: "precio_venta",
+  "precio lista": "precio_venta",
+  lista: "precio_venta",
+  "precio final": "precio_venta",
+  "precio publico": "precio_venta",
   stock: "stock",
+  cantidad: "stock",
   stock_minimo: "stock_minimo",
   "stock minimo": "stock_minimo",
-  "stock mínimo": "stock_minimo",
+};
+
+const sinAcentos = (v: unknown) =>
+  String(v ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[._-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+
+const claveColumna = (v: unknown): keyof Fila | null => {
+  const k = sinAcentos(v);
+  if (!k) return null;
+  if (ALIAS[k]) return ALIAS[k]!;
+  if (ALIAS[k.replace(/ /g, "_")]) return ALIAS[k.replace(/ /g, "_")]!;
+  if (/^(art|cod)/.test(k)) return "codigo";
+  if (k.includes("descrip") || k.includes("producto") || k.includes("nombre")) return "nombre";
+  if (k.includes("empresa") || k.includes("marca")) return "marca";
+  if (k.includes("costo")) return "precio_costo";
+  if (k.includes("precio") || k.includes("lista")) return "precio_venta";
+  if (k.includes("stock") && k.includes("min")) return "stock_minimo";
+  if (k.includes("stock")) return "stock";
+  return null;
 };
 
 const numero = (v: unknown) => {
-  const n = Number(
-    String(v ?? "")
-      .replace(/[^\d,.-]/g, "")
-      .replace(/\.(?=\d{3}\b)/g, "")
-      .replace(",", "."),
-  );
+  if (typeof v === "number") return Number.isFinite(v) ? v : 0;
+  let s = String(v ?? "")
+    .replace(/[^\d,.-]/g, "")
+    .trim();
+  if (!s) return 0;
+  const ultimaComa = s.lastIndexOf(",");
+  const ultimoPunto = s.lastIndexOf(".");
+  if (ultimaComa > -1 && ultimoPunto > -1) {
+    // el último separador es el decimal
+    const dec = Math.max(ultimaComa, ultimoPunto);
+    s = s.slice(0, dec).replace(/[.,]/g, "") + "." + s.slice(dec + 1).replace(/[.,]/g, "");
+  } else if (ultimaComa > -1) {
+    s = s.split(",").length > 2 || s.length - ultimaComa - 1 === 3
+      ? s.replace(/,/g, "")
+      : s.replace(",", ".");
+  } else if (ultimoPunto > -1) {
+    if (s.split(".").length > 2) s = s.replace(/\./g, "");
+  }
+  const n = Number(s);
   return Number.isFinite(n) ? n : 0;
 };
 
 function normalizar(matriz: unknown[][]): Fila[] {
-  const [cabecera, ...cuerpo] = matriz.filter((f) => f.some((c) => String(c ?? "").trim() !== ""));
-  if (!cabecera) return [];
-  const mapa = cabecera.map((c) => ALIAS[String(c ?? "").trim().toLowerCase()] ?? null);
-  const tieneCabecera = mapa.some(Boolean);
-  const filas = tieneCabecera ? cuerpo : matriz;
-  const columnas: (keyof Fila | null)[] = tieneCabecera
-    ? mapa
-    : ["codigo", "nombre", "marca", "precio_costo", "precio_venta", "stock"];
+  const datos = matriz.filter((f) => f.some((c) => String(c ?? "").trim() !== ""));
+  if (!datos.length) return [];
+
+  // buscar la fila de encabezados dentro de las primeras filas
+  let indiceCabecera = -1;
+  let columnas: (keyof Fila | null)[] = [];
+  for (let i = 0; i < Math.min(datos.length, 5); i++) {
+    const mapa = (datos[i] ?? []).map(claveColumna);
+    if (mapa.filter(Boolean).length >= 2) {
+      indiceCabecera = i;
+      columnas = mapa;
+      break;
+    }
+  }
+
+  const filas = indiceCabecera >= 0 ? datos.slice(indiceCabecera + 1) : datos;
+  if (indiceCabecera < 0) {
+    const ancho = Math.max(...datos.map((f) => f.length));
+    const base: (keyof Fila | null)[] = [
+      "codigo",
+      "nombre",
+      "marca",
+      "precio_costo",
+      "precio_venta",
+      "stock",
+    ];
+    columnas = Array.from({ length: ancho }, (_, i) => base[i] ?? null);
+  }
 
   return filas
     .map((f) => {
       const o: Record<string, unknown> = {};
       columnas.forEach((k, i) => {
-        if (k) o[k] = f[i];
+        if (k && o[k] === undefined) o[k] = f[i];
       });
       const codigo = String(o["codigo"] ?? "").trim();
       const nombre = String(o["nombre"] ?? "").trim();
-      if (!codigo || !nombre) return null;
+      if (!codigo && !nombre) return null;
       return {
-        codigo,
-        nombre,
+        codigo: codigo || nombre.slice(0, 40),
+        nombre: nombre || codigo,
         marca: String(o["marca"] ?? "").trim() || null,
         unidad: String(o["unidad"] ?? "").trim() || "unidad",
         unidades_por_bulto: numero(o["unidades_por_bulto"]) || 1,
@@ -102,12 +168,13 @@ export function ImportarProductos({ onListo }: { onListo: () => void }) {
 
   const leerPegado = (valor: string) => {
     setTexto(valor);
-    const matriz = valor
-      .split(/\r?\n/)
-      .map((l) => l.split(l.includes("\t") ? "\t" : ";"))
-      .filter((f) => f.length > 1);
+    const lineas = valor.split(/\r?\n/).filter((l) => l.trim() !== "");
+    const separador = (l: string) =>
+      l.includes("\t") ? "\t" : l.includes(";") ? ";" : /\s{2,}/.test(l) ? /\s{2,}/ : ",";
+    const matriz = lineas.map((l) => l.split(separador(l)).map((c) => c.trim()));
     setFilas(normalizar(matriz));
   };
+
 
   const leerArchivo = async (file: File) => {
     const XLSX = await import("xlsx");
