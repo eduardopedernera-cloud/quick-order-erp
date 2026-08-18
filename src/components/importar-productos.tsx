@@ -224,7 +224,7 @@ export function ImportarProductos({ onListo }: { onListo: () => void }) {
       .select("codigo, atributos")
       .in("codigo", codigos);
     const previos = new Map(
-      (existentes ?? []).map((p) => [p.codigo, (p.atributos ?? {}) as Record<string, unknown>]),
+      (existentes ?? []).map((p) => [p.codigo, (p.atributos ?? {}) as Record<string, string | number>]),
     );
     const payload = filas.map((f) => ({
       ...f,
