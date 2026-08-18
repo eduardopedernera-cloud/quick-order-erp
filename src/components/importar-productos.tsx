@@ -189,8 +189,13 @@ export function ImportarProductos({ onListo }: { onListo: () => void }) {
   };
 
   const guardar = async () => {
+    if (!filas.length) {
+      toast.error("No se detectaron filas válidas para importar");
+      return;
+    }
     setGuardando(true);
     const { error } = await supabase
+
       .from("productos")
       .upsert(filas, { onConflict: "codigo", ignoreDuplicates: false });
     setGuardando(false);
